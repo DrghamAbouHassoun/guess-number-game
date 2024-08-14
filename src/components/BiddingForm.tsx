@@ -1,10 +1,12 @@
 "use client";
 import { handleStartGame } from '@/lib/features/gameSlice';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { RootState } from '@/lib/store';
 import { Button, Label, TextInput } from 'flowbite-react';
 import React, { FormEvent, useState } from 'react'
 
 const BiddingForm = () => {
+  const { currentPoints } = useAppSelector((state: RootState) => state.game)
   const dispatch = useAppDispatch();
 
   const [biddingPoints, setBiddingPoints] = useState<number>(0);
@@ -12,11 +14,17 @@ const BiddingForm = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(handleStartGame({ points: biddingPoints, multiplier: biddingMultiplier }))
+    if (biddingPoints > currentPoints) {
+      alert("You don't have enough points to bid");
+      return;
+    }
+    dispatch(handleStartGame({ points: biddingPoints, multiplier: biddingMultiplier }));
+    setBiddingMultiplier(0);
+    setBiddingPoints(0);
   }
 
   return (
-    <form className="max-w-[400px] p-2" onClick={handleSubmit}>
+    <form className="max-w-[400px] p-2" onSubmit={handleSubmit}>
       <div className="my-3">
         <Label htmlFor='biddingPoints' className='text-white'>Points:</Label>
         <TextInput
@@ -37,7 +45,7 @@ const BiddingForm = () => {
           onChange={(e) => setBiddingMultiplier(parseFloat(e.target.value))}
         />
       </div>
-      <Button type='submit' fullSized className='my-3'>Bid</Button>
+      <Button type='submit' fullSized className='my-3'>Set a Bid</Button>
     </form>
   )
 }
