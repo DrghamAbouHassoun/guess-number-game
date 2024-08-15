@@ -1,8 +1,8 @@
-import { combineReducers, configureStore, Reducer } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import gameReducer from './features/gameSlice';
 import authReducer from './features/authSlice';
 import chatReducer from './features/chatSlice';
-import { persistStore, persistReducer, PersistConfig } from "redux-persist";
+import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 const persistConfig = {
