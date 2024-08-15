@@ -18,11 +18,12 @@ const RegisterForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="max-w-[400px] bg-gray-900 p-5 mx-auto rounded-md">
+      <h1 className="text-gray-400 text-3xl font-bold text-center mb-4">Enter Your Name:</h1>
       <div>
-        <FloatingLabel variant="outlined" label="Username" value={userName} onChange={(e) => setUserName(e.target.value)} />
+        <FloatingLabel className='bg-gray-900' variant="outlined" label="Username" value={userName} onChange={(e) => setUserName(e.target.value)} />
       </div>
-      <Button type="submit" fullSized >Register</Button>
+      <Button type="submit" fullSized >Start The Game</Button>
     </form>
   )
 }
