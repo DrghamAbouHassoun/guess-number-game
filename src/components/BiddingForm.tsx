@@ -1,12 +1,13 @@
 "use client";
-import { handleStartGame } from '@/lib/features/gameSlice';
+import { handleStartRound } from '@/lib/features/gameSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
 import { Button, Label, TextInput } from 'flowbite-react';
 import React, { FormEvent, useState } from 'react'
+import CounterInput from './CounterInput';
 
 const BiddingForm = () => {
-  const { currentPoints } = useAppSelector((state: RootState) => state.game)
+  const { currentPoints, isGameEnded } = useAppSelector((state: RootState) => state.game)
   const dispatch = useAppDispatch();
 
   const [biddingPoints, setBiddingPoints] = useState<number>(0);
@@ -18,34 +19,36 @@ const BiddingForm = () => {
       alert("You don't have enough points to bid");
       return;
     }
-    dispatch(handleStartGame({ points: biddingPoints, multiplier: biddingMultiplier }));
-    setBiddingMultiplier(0);
+    dispatch(handleStartRound({ points: biddingPoints, multiplier: biddingMultiplier }));
+    setBiddingMultiplier(1);
     setBiddingPoints(0);
   }
 
   return (
-    <form className="max-w-[400px] p-2" onSubmit={handleSubmit}>
-      <div className="my-3">
-        <Label htmlFor='biddingPoints' className='text-white'>Points:</Label>
-        <TextInput
-          type="number"
-          name="biddingPoints"
-          value={biddingPoints}
-          onChange={(e) => setBiddingPoints(parseInt(e.target.value))}
-        />
+    <form className="p-4 bg-gray-800 rounded-md" onSubmit={handleSubmit}>
+      <div className="max-w-[400px] mx-auto">
+        <div className="my-3">
+          <Label htmlFor='biddingPoints' className='text-white'>Points:</Label>
+          <CounterInput
+            value={biddingPoints}
+            onChange={(value) => setBiddingPoints(value)}
+            max={currentPoints}
+            min={0}
+            increaseValue={10}
+          />
+        </div>
+        <div className="my-3">
+          <Label htmlFor='biddingMultiplier' className='text-white'>Multiplier:</Label>
+          <CounterInput
+            value={biddingMultiplier}
+            onChange={(value) => setBiddingMultiplier(value)}
+            max={10}
+            min={1}
+            increaseValue={0.1}
+          />
+        </div>
+        <Button type='submit' fullSized className='my-3' disabled={isGameEnded}>Set a Bid</Button>
       </div>
-      <div className="my-3">
-        <Label htmlFor='biddingMultiplier' className='text-white'>Multiplier:</Label>
-        <TextInput
-          type="number"
-          name="biddingMultiplier"
-          min={1}
-          max={10}
-          value={biddingMultiplier}
-          onChange={(e) => setBiddingMultiplier(parseFloat(e.target.value))}
-        />
-      </div>
-      <Button type='submit' fullSized className='my-3'>Set a Bid</Button>
     </form>
   )
 }

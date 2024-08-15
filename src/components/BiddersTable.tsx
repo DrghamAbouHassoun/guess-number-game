@@ -2,33 +2,50 @@
 import { useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
 import { Table } from 'flowbite-react';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { FaRankingStar } from "react-icons/fa6";
+
+interface Player {
+  name: string;
+  points: number;
+  biddingMultiplier: number;
+  biddingPoints: number;
+}
 
 const BiddersTable = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const { botPlayers, currentPoints, biddingMultiplier, biddingPoints } = useAppSelector((state: RootState) => state.game);
+  const [players, setPlayers] = useState<Player[]>([])
 
-  const players = [{ name: user.name, points: currentPoints, biddingMultiplier, biddingPoints }, ...botPlayers]
+  useEffect(() => {
+    setPlayers([{ name: user.name, points: currentPoints, biddingMultiplier, biddingPoints }, ...botPlayers])
+  }, [user, botPlayers, biddingPoints, currentPoints, biddingMultiplier])
+
 
   return (
-    <Table>
-      <Table.Head>
-        <Table.HeadCell>Index</Table.HeadCell>
-        <Table.HeadCell>Name</Table.HeadCell>
-        <Table.HeadCell>Lst Bid</Table.HeadCell>
-        <Table.HeadCell>Points</Table.HeadCell>
-      </Table.Head>
-      <Table.Body>
-        {players.map((item, index) => (
-          <Table.Row key={index}>
-            <Table.Cell>{index}</Table.Cell>
-            <Table.Cell>{item.name}</Table.Cell>
-            <Table.Cell>{item.biddingMultiplier}</Table.Cell>
-            <Table.Cell>{item.points}</Table.Cell>
-          </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+    <div>
+      <h3 className="flex gap-2 items-center text-xl p-3"><FaRankingStar size={24} className='text-orange-500' /> Ranking</h3>
+      <Table bgcolor=''>
+        <Table.Head>
+          <Table.HeadCell>Index</Table.HeadCell>
+          <Table.HeadCell>Name</Table.HeadCell>
+          <Table.HeadCell>Predection</Table.HeadCell>
+          <Table.HeadCell>Lst Bid</Table.HeadCell>
+          <Table.HeadCell>Points</Table.HeadCell>
+        </Table.Head>
+        <Table.Body>
+          {players.map((item, index) => (
+            <Table.Row key={index}  className="bg-white dark:border-gray-700 dark:bg-gray-800">
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{index + 1}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.name}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.biddingMultiplier}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.biddingPoints}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.points}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import randomNumberGenerator from "@/helpers/randomNumberGenerator";
+import randomNumberGenerator, { generateRandomNumber } from "@/helpers/randomNumberGenerator";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialState {
@@ -6,49 +6,60 @@ interface InitialState {
   currentPoints: number;
   biddingPoints: number;
   biddingMultiplier: number;
-  isGameStarted: boolean;
+  isRoundStarted: boolean;
   records: {
     biddingPoints: number;
     result: number;
   }[],
-  botPlayers: { 
+  botPlayers: {
     name: string;
     biddingMultiplier: number;
     points: number;
-    biddingPoint: number;
+    biddingPoints: number;
   }[];
+  currentRound: number;
+  isGameEnded: boolean;
+  // gameRounds: {
+  //   currentRound: number,
+  //   gameRecords: {
+  //     roundNumber: number;
+  //     records: 
+  //   }[]
+  // }
 }
 
 const initialState: InitialState = {
+  currentRound: 0,
   randomPoint: 10,
   currentPoints: 400,
   biddingMultiplier: 0,
   biddingPoints: 0,
-  isGameStarted: false,
+  isRoundStarted: false,
+  isGameEnded: false,
   records: [],
   botPlayers: [
     {
       name: "CPU 1",
       points: 400,
-      biddingPoint: 0,
+      biddingPoints: 0,
       biddingMultiplier: 1,
     },
     {
       name: "CPU 2",
       points: 400,
-      biddingPoint: 0,
+      biddingPoints: 0,
       biddingMultiplier: 1,
     },
     {
       name: "CPU 3",
       points: 400,
-      biddingPoint: 0,
+      biddingPoints: 0,
       biddingMultiplier: 1,
     },
     {
       name: "CPU 4",
       points: 400,
-      biddingPoint: 0,
+      biddingPoints: 0,
       biddingMultiplier: 1,
     },
   ]
@@ -68,36 +79,68 @@ export const gameSlice = createSlice({
     handleChangeBiddingMultiplier: (state, action: PayloadAction<number>) => {
       state.biddingMultiplier = action.payload;
     },
-    handleStartGame: (state, action: PayloadAction<{ points: number, multiplier: number }>) => {
+    handleStartRound: (state, action: PayloadAction<{ points: number, multiplier: number }>) => {
+      state.botPlayers = state.botPlayers.map(item => {
+        if (item.points > 50) {
+          return ({
+            ...item,
+            biddingMultiplier: randomNumberGenerator(),
+            biddingPoint: generateRandomNumber(item.points),
+          })
+        } else if (item.points <= 50 && item.points > 0) {
+          return ({
+            ...item,
+            biddingMultiplier: randomNumberGenerator(),
+            biddingPoint: item.points,
+          })
+        } else {
+          return item;
+        }
+      })
       state.randomPoint = randomNumberGenerator();
       state.biddingMultiplier = action.payload.multiplier
       state.biddingPoints = action.payload.points
-      state.isGameStarted = true;
+      state.isRoundStarted = true;
     },
-    handleEndGame: (state) => {
-      state.isGameStarted = false;
-      console.log("Bidding Points: ", state.biddingPoints);
-      console.log("Random Point: ", state.randomPoint);
+    handleEndRound: (state) => {
+      state.isRoundStarted = false;
+      state.botPlayers = state.botPlayers.map(item => {
+        if (item.biddingMultiplier <= state.randomPoint) {
+          return ({
+            ...item,
+            points: item.points + item.biddingPoints * item.biddingMultiplier,
+          })
+        } else {
+          return ({
+            ...item,
+            points: item.points - item.biddingPoints,
+          })
+        }
+      })
       if (state.biddingMultiplier <= state.randomPoint) {
-        console.log("SUm: ",state.biddingPoints * state.biddingMultiplier)
+        console.log("SUm: ", state.biddingPoints * state.biddingMultiplier)
         state.currentPoints += state.biddingPoints * state.biddingMultiplier;
         state.records.push({ biddingPoints: state.biddingPoints, result: state.biddingPoints * state.biddingMultiplier })
       } else {
         state.currentPoints -= state.biddingPoints;
         state.records.push({ biddingPoints: state.biddingPoints, result: -state.biddingPoints })
       }
-      state.biddingMultiplier = 0;
-      state.biddingPoints = 0;
-
+      // state.biddingMultiplier = 1;
+      // state.biddingPoints = 0;
+      state.currentRound += 1;
+    },
+    handleEndGame: (state) => {
+      state.isGameEnded = true;
     }
   }
 })
 
-export const { 
-  handleChangeBiddingMultiplier, 
-  handleChangeBiddingPoints, 
+export const {
+  handleChangeBiddingMultiplier,
+  handleChangeBiddingPoints,
   handleChangeCurrentPoinst,
-  handleStartGame,
+  handleStartRound,
+  handleEndRound,
   handleEndGame,
 } = gameSlice.actions;
 

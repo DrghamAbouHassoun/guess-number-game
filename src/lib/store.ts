@@ -1,16 +1,32 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore, Reducer } from '@reduxjs/toolkit';
 import gameReducer from './features/gameSlice';
 import authReducer from './features/authSlice';
+import chatReducer from './features/chatSlice';
+import { persistStore, persistReducer, PersistConfig } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      game: gameReducer,
-      auth: authReducer
-    },
-  })
+const persistConfig = {
+  key: "root",
+  storage: storage,
+  whitelist: ["auth"]
 }
 
-export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore['dispatch'];
+
+const rootReducer= combineReducers({
+  game: gameReducer,
+  auth: authReducer,
+  chat: chatReducer,
+})
+
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+
+export const store = configureStore({
+    reducer: persistedReducer,
+  })
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export const persistor = persistStore(store);
+

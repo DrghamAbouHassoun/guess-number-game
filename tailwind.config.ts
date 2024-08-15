@@ -8,7 +8,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     flowbite.content(),
   ],
-  darkMode: "selector",
+  darkMode: "class",
   theme: {
     
     extend: {
