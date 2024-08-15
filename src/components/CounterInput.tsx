@@ -1,5 +1,5 @@
 import { Button } from 'flowbite-react';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { FaCaretDown, FaCaretUp } from "react-icons/fa6"
 
 interface CounterInputProps {
@@ -19,13 +19,29 @@ const CounterInput = ({ value, onChange, max = 400, min = 0, increaseValue = 1 }
     onChange(Math.round(newValue * 10) / 10)
   }
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value: inputValue } = e.target;
+
+    // Regular expression to match number with up to one decimal point
+    const regex = /^[0-9]*\.?[0-9]?$/;
+
+    if (regex.test(inputValue)) {
+      handleChange(parseFloat(inputValue));
+    }
+  }
+
   return (
     <div className="flex gap-1 w-full">
-      <Button color="dark" onClick={() => handleChange(value - increaseValue)}>
+      <Button color="dark" className='flex justify-center items-center' onClick={() => handleChange(value - increaseValue)}>
         <FaCaretDown />
       </Button>
-      <p className="bg-slate-800 p-2 flex-1 rounded-md border border-gray-300 min-w-[100px] text-center">{value}</p>
-      <Button color="dark" onClick={() => handleChange(value + increaseValue)}>
+      <input 
+        type="text" 
+        value={value || 0} 
+        onChange={handleInputChange}
+        className="bg-slate-800 p-2 flex-1 rounded-md border border-gray-300 min-w-[100px] text-center" 
+      />
+      <Button color="dark" className='flex justify-center items-center' onClick={() => handleChange(value + increaseValue)}>
         <FaCaretUp />
       </Button>
     </div>

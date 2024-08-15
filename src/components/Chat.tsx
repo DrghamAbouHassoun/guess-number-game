@@ -1,15 +1,18 @@
 "use client";
+import { getRandomMinutes } from '@/helpers/randomNumberGenerator';
 import { appendMessage } from '@/lib/features/chatSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
 import { Button, TextInput } from 'flowbite-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { IoChatboxEllipses, IoSend } from "react-icons/io5";
+import fakeData from "@/static/data.json";
 
 const Chat = () => {
   const dispatch = useAppDispatch();
   const { messages } = useAppSelector((state: RootState) => state.chat);
-  const { user } = useAppSelector((state: RootState) => state.auth)
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  const { botPlayers } = useAppSelector((state: RootState) => state.game);
 
   const [messageString, setMessageString] = useState<string>("");
 
@@ -20,6 +23,22 @@ const Chat = () => {
       setMessageString("");
     }
   }
+
+  const [count, setCount] = useState<number>(0)
+
+  useEffect(() => {
+    if (count >= 4) {
+      return;
+    }
+    setTimeout(() => {
+      dispatch(appendMessage({ 
+        username: botPlayers[count].name, 
+        body: fakeData.messages[count], 
+        createdAt: new Date() 
+      }))
+      setCount(prev => prev + 1)
+    }, getRandomMinutes(1, 20) * 1000)
+  }, [count])
 
   return (
     <div>

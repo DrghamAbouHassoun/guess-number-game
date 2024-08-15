@@ -40,7 +40,7 @@ const BiddersTable = () => {
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.name}</Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.biddingMultiplier}</Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.biddingPoints}</Table.Cell>
-              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.points}</Table.Cell>
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{Math.round(item.points * 100) / 100}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>

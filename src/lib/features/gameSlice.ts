@@ -1,4 +1,6 @@
-import randomNumberGenerator, { generateRandomNumber } from "@/helpers/randomNumberGenerator";
+import randomNumberGenerator, {
+  generateRandomNumber,
+} from "@/helpers/randomNumberGenerator";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialState {
@@ -10,7 +12,7 @@ interface InitialState {
   records: {
     biddingPoints: number;
     result: number;
-  }[],
+  }[];
   botPlayers: {
     name: string;
     biddingMultiplier: number;
@@ -19,13 +21,6 @@ interface InitialState {
   }[];
   currentRound: number;
   isGameEnded: boolean;
-  // gameRounds: {
-  //   currentRound: number,
-  //   gameRecords: {
-  //     roundNumber: number;
-  //     records: 
-  //   }[]
-  // }
 }
 
 const initialState: InitialState = {
@@ -62,9 +57,8 @@ const initialState: InitialState = {
       biddingPoints: 0,
       biddingMultiplier: 1,
     },
-  ]
-
-}
+  ],
+};
 
 export const gameSlice = createSlice({
   name: "game",
@@ -79,61 +73,67 @@ export const gameSlice = createSlice({
     handleChangeBiddingMultiplier: (state, action: PayloadAction<number>) => {
       state.biddingMultiplier = action.payload;
     },
-    handleStartRound: (state, action: PayloadAction<{ points: number, multiplier: number }>) => {
-      state.botPlayers = state.botPlayers.map(item => {
+    handleStartRound: (
+      state,
+      action: PayloadAction<{ points: number; multiplier: number }>
+    ) => {
+      state.botPlayers = state.botPlayers.map((item) => {
         if (item.points > 50) {
-          return ({
+          return {
             ...item,
             biddingMultiplier: randomNumberGenerator(),
-            biddingPoint: generateRandomNumber(item.points),
-          })
+            biddingPoints: generateRandomNumber(item.points),
+          };
         } else if (item.points <= 50 && item.points > 0) {
-          return ({
+          return {
             ...item,
             biddingMultiplier: randomNumberGenerator(),
-            biddingPoint: item.points,
-          })
+            biddingPoints: item.points,
+          };
         } else {
-          return item;
+          return {...item, biddingMultiplier: 0, biddingPoints: 0 };
         }
-      })
+      });
       state.randomPoint = randomNumberGenerator();
-      state.biddingMultiplier = action.payload.multiplier
-      state.biddingPoints = action.payload.points
+      state.biddingMultiplier = action.payload.multiplier;
+      state.biddingPoints = action.payload.points;
       state.isRoundStarted = true;
     },
     handleEndRound: (state) => {
       state.isRoundStarted = false;
-      state.botPlayers = state.botPlayers.map(item => {
+      state.botPlayers = state.botPlayers.map((item) => {
         if (item.biddingMultiplier <= state.randomPoint) {
-          return ({
+          return {
             ...item,
-            points: item.points + item.biddingPoints * item.biddingMultiplier,
-          })
+            points: item.points + Math.round(item.biddingPoints * item.biddingMultiplier * 100) / 100,
+          };
         } else {
-          return ({
+          return {
             ...item,
             points: item.points - item.biddingPoints,
-          })
+          };
         }
-      })
+      });
       if (state.biddingMultiplier <= state.randomPoint) {
-        console.log("SUm: ", state.biddingPoints * state.biddingMultiplier)
-        state.currentPoints += state.biddingPoints * state.biddingMultiplier;
-        state.records.push({ biddingPoints: state.biddingPoints, result: state.biddingPoints * state.biddingMultiplier })
+        state.currentPoints += Math.round(state.biddingPoints * state.biddingMultiplier * 100) / 100;
+        state.records.push({
+          biddingPoints: state.biddingPoints,
+          result: Math.round(state.biddingPoints * state.biddingMultiplier * 100) / 100,
+        });
       } else {
         state.currentPoints -= state.biddingPoints;
-        state.records.push({ biddingPoints: state.biddingPoints, result: -state.biddingPoints })
+        state.records.push({
+          biddingPoints: state.biddingPoints,
+          result: -state.biddingPoints,
+        });
       }
-      // state.biddingMultiplier = 1;
-      // state.biddingPoints = 0;
       state.currentRound += 1;
     },
     handleEndGame: (state) => {
       state.isGameEnded = true;
-    }
-  }
-})
+    },
+  },
+});
 
 export const {
   handleChangeBiddingMultiplier,

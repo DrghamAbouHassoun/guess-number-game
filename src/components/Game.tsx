@@ -42,7 +42,7 @@ const Game = () => {
     if (isRoundStarted) {
       if (count >= randomPoint) {
         dispatch(handleEndRound());
-        setCount(randomPoint);
+        setCount(1);
         return;
       }
 
@@ -80,7 +80,7 @@ const Game = () => {
           {randomPoint}
           <div className='grid grid-cols-2 gap-5'>
             <BiddingForm />
-            <Chart value={count} />
+            <Chart value={isRoundStarted || randomPoint === 10 ? count : randomPoint} />
             {/* <h3>Current Poinst: {currentPoints}</h3> */}
             {/* <BiddingsTable /> */}
             <BiddersTable />
