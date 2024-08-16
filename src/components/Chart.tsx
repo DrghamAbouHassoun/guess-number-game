@@ -15,7 +15,7 @@ interface ChartProps {
 
 
 const Chart = ({ value }: ChartProps) => {
-  const { randomPoint, isRoundStarted } = useAppSelector((state: RootState) => state.game)
+  const { randomPoint, isRoundStarted, roundSpeed } = useAppSelector((state: RootState) => state.game)
 
   const canvRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -53,16 +53,14 @@ const Chart = ({ value }: ChartProps) => {
     }
   }, [randomPoint])
 
-
-
   return (
     <div className="w-full h-full bg-gray-900 rounded-md overflow-hidden">
       <div className="flex justify-center items-center relative  w-[500px] h-[300px] overflow-hidden">
         <div
-          className={`w-full h-full absolute bg-gray-900 ${isRoundStarted ? "overlay-translate" : "translate-x-[500px]"}`}
-          // className={`w-full h-full absolute bg-gray-900`}
-          // style={{ transform: `transitionX(${value * 50}px)`}}
-        // style={{ animationDuration: "12000ms" }}
+          // className={`w-full h-full absolute bg-gray-900 ${isRoundStarted ? "overlay-translate" : "translate-x-[500px]"}`}
+          className={`w-full h-full absolute bg-gray-900 transition-transform duration-300`}
+          // style={{ animationDuration: `${(6 - roundSpeed) * 1800}ms`}}
+        style={{ transform: `translateX(${((value) * 50) + 2}px)` }}
         ></div>
         <canvas ref={canvRef} width={500} height={300} className='bg-gray-900 rounded-md'></canvas>
 

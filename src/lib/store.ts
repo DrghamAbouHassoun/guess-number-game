@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import gameReducer from './features/gameSlice';
 import authReducer from './features/authSlice';
 import chatReducer from './features/chatSlice';
+import modalReducer from './features/modalSlice';
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -16,6 +17,7 @@ const rootReducer= combineReducers({
   game: gameReducer,
   auth: authReducer,
   chat: chatReducer,
+  modal: modalReducer,
 })
 
 

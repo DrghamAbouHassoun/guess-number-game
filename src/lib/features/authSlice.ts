@@ -18,7 +18,7 @@ export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    handleRegister: (state: InitialState, action: PayloadAction<{ name: string}>) => {
+    handleRegister: (state: InitialState, action: PayloadAction<{ name: string }>) => {
       state.user = action.payload;
       state.status = "authenticated";
     },

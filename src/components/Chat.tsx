@@ -19,7 +19,8 @@ const Chat = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (messageString) {
-      dispatch(appendMessage({ body: messageString, username: user.name, createdAt: new Date() }))
+      const newData = new Date();
+      dispatch(appendMessage({ body: messageString, username: user.name, createdAt: newData.toString() }))
       setMessageString("");
     }
   }
@@ -31,10 +32,11 @@ const Chat = () => {
       return;
     }
     setTimeout(() => {
+      const newDate = new Date();
       dispatch(appendMessage({ 
         username: botPlayers[count].name, 
         body: fakeData.messages[count], 
-        createdAt: new Date() 
+        createdAt: newDate.toString(),
       }))
       setCount(prev => prev + 1)
     }, getRandomMinutes(1, 20) * 1000)

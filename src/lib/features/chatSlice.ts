@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface Message {
   username: string;
   body: string;
-  createdAt: Date
+  createdAt: string
 }
 
 interface InitialState {

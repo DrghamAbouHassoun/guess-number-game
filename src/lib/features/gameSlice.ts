@@ -4,6 +4,7 @@ import randomNumberGenerator, {
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface InitialState {
+  roundSpeed: number;
   randomPoint: number;
   currentPoints: number;
   biddingPoints: number;
@@ -24,6 +25,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
+  roundSpeed: 1,
   currentRound: 0,
   randomPoint: 10,
   currentPoints: 400,
@@ -75,7 +77,7 @@ export const gameSlice = createSlice({
     },
     handleStartRound: (
       state,
-      action: PayloadAction<{ points: number; multiplier: number }>
+      action: PayloadAction<{ points: number; multiplier: number, roundSpeed: number }>
     ) => {
       state.botPlayers = state.botPlayers.map((item) => {
         if (item.points > 50) {
@@ -94,6 +96,7 @@ export const gameSlice = createSlice({
           return {...item, biddingMultiplier: 0, biddingPoints: 0 };
         }
       });
+      state.roundSpeed = action.payload.roundSpeed;
       state.randomPoint = randomNumberGenerator();
       state.biddingMultiplier = action.payload.multiplier;
       state.biddingPoints = action.payload.points;
@@ -132,6 +135,17 @@ export const gameSlice = createSlice({
     handleEndGame: (state) => {
       state.isGameEnded = true;
     },
+    handleRestartGame: (state) => {
+      state.biddingMultiplier = initialState.biddingMultiplier;
+      state.biddingPoints = initialState.biddingPoints;
+      state.botPlayers = initialState.botPlayers;
+      state.isGameEnded = initialState.isGameEnded;
+      state.currentPoints = initialState.currentPoints;
+      state.isRoundStarted = initialState.isRoundStarted;
+      state.records = initialState.records;
+      state.randomPoint = initialState.randomPoint;
+      state.currentRound = initialState.currentRound;
+    }
   },
 });
 
@@ -142,6 +156,7 @@ export const {
   handleStartRound,
   handleEndRound,
   handleEndGame,
+  handleRestartGame,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

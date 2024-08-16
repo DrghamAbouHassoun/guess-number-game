@@ -2,16 +2,17 @@
 import { handleStartRound } from '@/lib/features/gameSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Button, Label, RangeSlider, TextInput } from 'flowbite-react';
 import React, { FormEvent, useState } from 'react'
 import CounterInput from './CounterInput';
 
 const BiddingForm = () => {
-  const { currentPoints, isGameEnded } = useAppSelector((state: RootState) => state.game)
+  const { currentPoints, isGameEnded, roundSpeed, isRoundStarted } = useAppSelector((state: RootState) => state.game)
   const dispatch = useAppDispatch();
 
   const [biddingPoints, setBiddingPoints] = useState<number>(0);
   const [biddingMultiplier, setBiddingMultiplier] = useState<number>(1.0);
+  const [selectedRoundSpeed, setSelectedRoundSpeed] = useState<string>(roundSpeed?.toString())
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ const BiddingForm = () => {
       alert("You don't have enough points to bid");
       return;
     }
-    dispatch(handleStartRound({ points: biddingPoints, multiplier: biddingMultiplier }));
+    dispatch(handleStartRound({ points: biddingPoints, multiplier: biddingMultiplier, roundSpeed: parseInt(selectedRoundSpeed) }));
     setBiddingMultiplier(1);
     setBiddingPoints(0);
   }
@@ -47,7 +48,21 @@ const BiddingForm = () => {
             increaseValue={0.1}
           />
         </div>
-        <Button type='submit' fullSized className='my-3' disabled={isGameEnded}>Set a Bid</Button>
+        <div>
+          <div className="mb-1 block">
+            <Label htmlFor="default-range" value={`Speed of Round: ${selectedRoundSpeed}x`} />
+          </div>
+          <RangeSlider 
+            id="default-range" 
+            value={selectedRoundSpeed} 
+            onChange={(e) => setSelectedRoundSpeed(e.target.value)} 
+            min={1}
+            max={5}
+            className='text-cyan-600'
+            disabled={isRoundStarted}
+          />
+        </div>
+        <Button type='submit' fullSized className='my-3' disabled={isGameEnded || isRoundStarted}>Set a Bid</Button>
       </div>
     </form>
   )

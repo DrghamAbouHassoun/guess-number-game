@@ -1,16 +1,12 @@
 "use client";
 import { useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
+import { Player } from '@/types/types';
 import { Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import { FaRankingStar } from "react-icons/fa6";
 
-interface Player {
-  name: string;
-  points: number;
-  biddingMultiplier: number;
-  biddingPoints: number;
-}
+
 
 const BiddersTable = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);

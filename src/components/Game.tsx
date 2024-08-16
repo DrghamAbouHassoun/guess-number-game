@@ -1,8 +1,6 @@
 "use client";
-import { Button } from 'flowbite-react';
 import React, { use, useEffect, useState } from 'react';
 
-import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +10,6 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartData,
 } from "chart.js";
 import Chart from './Chart';
 import Layout from './Layout';
@@ -20,26 +17,28 @@ import BiddingForm from './BiddingForm';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { RootState } from '@/lib/store';
 import { handleEndGame, handleEndRound } from '@/lib/features/gameSlice';
-import BiddingsTable from './BiddingsTable';
 import RegisterForm from './RegisterForm';
 import BiddersTable from './BiddersTable';
 import Chat from './Chat';
 import { FaMedal, FaUserAlt } from "react-icons/fa";
 import { IoGameController } from "react-icons/io5";
+import ResultsModal from './ResultsModal';
+import { handleToggleModal } from '@/lib/features/modalSlice';
+import { Button } from 'flowbite-react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
 
 const Game = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state: RootState) => state.auth)
-  const { currentPoints, isRoundStarted, randomPoint, currentRound, isGameEnded } = useAppSelector((state: RootState) => state.game);
+  const { currentPoints, roundSpeed, isRoundStarted, randomPoint, currentRound, isGameEnded } = useAppSelector((state: RootState) => state.game);
   const { status } = useAppSelector((state: RootState) => state.auth);
 
   const [count, setCount] = useState<number>(1);
 
   useEffect(() => {
     if (isRoundStarted) {
+      const intervelSpeed = 120 - (roundSpeed * 20)
       if (count >= randomPoint) {
         dispatch(handleEndRound());
         setCount(1);
@@ -48,7 +47,7 @@ const Game = () => {
 
       const intervel = setInterval(() => {
         setCount(prev => Math.round((prev + 0.1) * 100) / 100);
-      }, 100)
+      }, intervelSpeed)
       return () => clearInterval(intervel);
     }
   }, [count, isRoundStarted, randomPoint]);
@@ -56,13 +55,18 @@ const Game = () => {
   useEffect(() => {
     if (currentRound >= 4) {
       dispatch(handleEndGame());
+      dispatch(handleToggleModal(true))
     }
   }, [currentRound]);
 
   return (
     <Layout>
+      <ResultsModal />
       {status === "authenticated" ?
         <>
+        <div>
+          {isGameEnded ? <Button className='my-5' onClick={() => dispatch(handleToggleModal(true))}>Show Results</Button> : null}
+        </div>
         <div className="flex items-center gap-5 mb-5">
           <div className="flex-1 bg-slate-600 flex items-center gap-3 justify-center p-3 rounded-md">
             <FaMedal className="text-yellow-300" size={24} />
@@ -77,7 +81,6 @@ const Game = () => {
             {currentRound} / 4
           </div>
         </div>
-          {randomPoint}
           <div className='grid grid-cols-2 gap-5'>
             <BiddingForm />
             <Chart value={isRoundStarted || randomPoint === 10 ? count : randomPoint} />
